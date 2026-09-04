@@ -1,57 +1,57 @@
-﻿using BLL.DTOs;
+using BLL.DTOs;
 using DAL.EF.Model;
 using DAL.Repos;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BLL.Services
 {
     public class CourseService
     {
-        CourseRepo repo;
+        private readonly CourseRepo repo;
+
         public CourseService(CourseRepo repo)
         {
             this.repo = repo;
         }
-        public List<CourseDTO> Get() {
-         var data = repo.Get();
-            var Mapper =MapperConfig.GetMapper();
-            var ret = Mapper.Map<List<CourseDTO>>(data);
-            return ret;
+
+        public List<CourseDTO> Get()
+        {
+            var data = repo.Get();
+            var mapper = MapperConfig.GetMapper();
+            return mapper.Map<List<CourseDTO>>(data);
         }
+
         public CourseDTO Get(int id)
         {
             var data = repo.Get(id);
-            var Mapper = MapperConfig.GetMapper();
-            var ret = Mapper.Map<CourseDTO>(data);
-            return ret;
+            var mapper = MapperConfig.GetMapper();
+            return mapper.Map<CourseDTO>(data);
         }
-        public bool Create(CourseDTO c)
+
+        public bool Create(CourseDTO course)
         {
-            var Mapper = MapperConfig.GetMapper();
-            var data=Mapper.Map<Course>(c);
+            var mapper = MapperConfig.GetMapper();
+            var data = mapper.Map<Course>(course);
             return repo.Create(data);
         }
-        public bool Update(CourseDTO c)
+
+        public bool Update(CourseDTO course)
         {
-            var Mapper = MapperConfig.GetMapper();
-            var data = Mapper.Map<Course>(c);
+            var mapper = MapperConfig.GetMapper();
+            var data = mapper.Map<Course>(course);
             return repo.Update(data);
         }
+
         public bool Delete(int id)
         {
             return repo.Delete(id);
         }
 
-       
         public List<CourseDTO> GetCoursesSortedByDuration()
         {
             var data = repo.GetCoursesSortedByDuration();
-            var Mapper = MapperConfig.GetMapper();
-            return Mapper.Map<List<CourseDTO>>(data);
+            var mapper = MapperConfig.GetMapper();
+            return mapper.Map<List<CourseDTO>>(data);
         }
     }
 }

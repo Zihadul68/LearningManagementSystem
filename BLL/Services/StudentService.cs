@@ -1,86 +1,69 @@
-﻿using BLL.DTOs;
-using DAL;
-using DAL.EF.Model;
-using DAL.Repos;
 using BLL.DTOs;
-using DAL;
 using DAL.EF.Model;
 using DAL.Repos;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
+
 namespace BLL.Services
 {
     public class StudentService
     {
-        StudentRepo repo;
+        private readonly StudentRepo repo;
+
         public StudentService(StudentRepo repo)
         {
             this.repo = repo;
         }
+
         public List<StudentDTO> Get()
         {
             var data = repo.Get();
-            var Mapper = MapperConfig.GetMapper();
-            var ret = Mapper.Map<List<StudentDTO>>(data);
-            return ret;
+            var mapper = MapperConfig.GetMapper();
+            return mapper.Map<List<StudentDTO>>(data);
         }
+
         public StudentDTO Get(int id)
         {
             var data = repo.Get(id);
-            var Mapper = MapperConfig.GetMapper();
-            var ret = Mapper.Map<StudentDTO>(data);
-            return ret;
+            var mapper = MapperConfig.GetMapper();
+            return mapper.Map<StudentDTO>(data);
         }
-        public bool Create(StudentDTO s)
+
+        public bool Create(StudentDTO student)
         {
-            var Mapper = MapperConfig.GetMapper();
-            var data = Mapper.Map<Student>(s);
+            var mapper = MapperConfig.GetMapper();
+            var data = mapper.Map<Student>(student);
             return repo.Create(data);
         }
 
-
-        public bool Update(StudentDTO s)
+        public bool Update(StudentDTO student)
         {
-            var Mapper = MapperConfig.GetMapper();
-            var data = Mapper.Map<Student>(s);
+            var mapper = MapperConfig.GetMapper();
+            var data = mapper.Map<Student>(student);
             return repo.Update(data);
-
         }
+
         public bool Delete(int id)
         {
             return repo.Delete(id);
         }
+
         public List<EnrollmentDTO> SeeEnrollment(int id)
         {
-
             var data = repo.SeeEnrollments(id);
             var mapper = MapperConfig.GetMapper();
-            var ret = mapper.Map<List<EnrollmentDTO>>(data);
-            return ret;
+            return mapper.Map<List<EnrollmentDTO>>(data);
         }
+
         public List<object> Dashboard(int id)
         {
             return repo.Dashboard(id);
-        }
-
-        public static void ExportStudentsToPdf(string filepath)
-        {
-            var repo = DataAccessFactory.StudentFeatures();
-            repo.ExportStudentsToPdf(filepath);
         }
 
         public List<StudentDTO> SearchByName(string name)
         {
             var results = repo.SearchByName(name);
             var mapper = MapperConfig.GetMapper();
-            if (results == null) return new List<StudentDTO>();
             return mapper.Map<List<StudentDTO>>(results);
         }
-
-
     }
 }

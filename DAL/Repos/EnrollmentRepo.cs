@@ -66,7 +66,7 @@ namespace DAL.Repos
                         {"Name", db.Students.Find(e.StudentId).Name },
                         {"Email", db.Students.Find(e.StudentId).Email },
                         {"Phone", db.Students.Find(e.StudentId).PhoneNumber },
-                        {"CGPA", db.Students.Find(e.StudentId).CGPA }
+                        {"CGPA", db.Students.Find(e.StudentId)?.CGPA.ToString("0.00") ?? "Unknown" }
 
                     })
                     .ToList()

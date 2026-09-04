@@ -62,7 +62,7 @@ namespace DAL.Repos
                             { "Name", student?.Name ?? "Unknown" },
                             { "Email", student?.Email ?? "Unknown" },
                             { "Phone", student?.PhoneNumber ?? "Unknown" },
-                            { "CGPA", student?.CGPA ?? "Unknown" }
+                            { "CGPA", student == null ? "Unknown" : student.CGPA.ToString("0.00") }
                         };
                     })
                     .ToList()

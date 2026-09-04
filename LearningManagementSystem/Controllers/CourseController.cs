@@ -1,11 +1,6 @@
-﻿using BLL.Services;
 using BLL.DTOs;
-using DAL.Interfaces;
-
-using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Http;
+using BLL.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace LearningManagementSystem.Controllers
 {
@@ -14,6 +9,7 @@ namespace LearningManagementSystem.Controllers
     public class CourseController : ControllerBase
     {
         private readonly CourseService _service;
+
         public CourseController(CourseService service)
         {
             _service = service;
@@ -30,7 +26,10 @@ namespace LearningManagementSystem.Controllers
         public IActionResult Get(int id)
         {
             var data = _service.Get(id);
-            if (data == null) return NotFound();
+
+            if (data == null)
+                return NotFound();
+
             return Ok(data);
         }
 
@@ -45,15 +44,27 @@ namespace LearningManagementSystem.Controllers
                 return ValidationProblem(ModelState);
 
             var created = _service.Create(c);
-            if (!created) return BadRequest("Could not create course.");
+
+            if (!created)
+                return BadRequest("Could not create course.");
+
             return Ok(created);
         }
 
         [HttpPut("update")]
         public IActionResult Update([FromBody] CourseDTO c)
         {
+            if (c == null)
+                return BadRequest("Request body is empty or contains invalid JSON.");
+
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+
             var updated = _service.Update(c);
-            if (!updated) return BadRequest();
+
+            if (!updated)
+                return NotFound("Course not found or could not be updated.");
+
             return Ok(updated);
         }
 
@@ -61,7 +72,10 @@ namespace LearningManagementSystem.Controllers
         public IActionResult Delete(int id)
         {
             var deleted = _service.Delete(id);
-            if (!deleted) return NotFound();
+
+            if (!deleted)
+                return NotFound();
+
             return Ok(deleted);
         }
 

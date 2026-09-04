@@ -1,11 +1,8 @@
-﻿using DAL.EF;
+using DAL.EF;
 using DAL.EF.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DAL.Repos
 {
@@ -13,15 +10,14 @@ namespace DAL.Repos
     {
         private readonly LMSContext db;
 
-      
         public StudentRepo(LMSContext db)
         {
             this.db = db ?? throw new ArgumentNullException(nameof(db));
         }
 
-        public bool Create(Student s)
+        public bool Create(Student student)
         {
-            db.Students.Add(s);
+            db.Students.Add(student);
             return db.SaveChanges() > 0;
         }
 
@@ -32,52 +28,35 @@ namespace DAL.Repos
 
             var enrollments = db.Enrollments.Where(e => e.StudentId == id).ToList();
             var courses = db.Courses.ToList();
-            List<Course> enrolledcourses = new List<Course>();
 
-            foreach (Enrollment e in enrollments)
-            {
-                foreach (Course c in courses)
-                {
-                    if (e.CourseId == c.Id)
-                    {
-                        enrolledcourses.Add(c);
-                    }
-                }
-            }
             var result = new List<object>
             {
-
                 new Dictionary<string, object>
                 {
                     { "StudentId", student.StudentId },
-                   // { "RegistrationNumber", student.RegistrationNumber },
                     { "Name", student.Name },
                     { "Email", student.Email },
                     { "PhoneNumber", student.PhoneNumber },
                     { "CGPA", student.CGPA }
                 },
-
                 new Dictionary<string, object>
                 {
-                    { "Enrollment", enrollments
-                        .Select(e =>
+                    { "Enrollment", enrollments.Select(enrollment =>
                         {
-                            
-                            var course = db.Courses.Find(e.CourseId);
+                            var course = courses.FirstOrDefault(c => c.Id == enrollment.CourseId);
                             return new Dictionary<string, object>
                             {
-                                {"Enrollment ID", e.EnrollId },
-                                { "Enrollment Date", e.EnrollmentDate },
-                                { "Progress", e.Progress },
-                                { "Course ID", e.CourseId },
+                                { "Enrollment ID", enrollment.EnrollId },
+                                { "Enrollment Date", enrollment.EnrollmentDate },
+                                { "Progress", enrollment.Progress },
+                                { "Course ID", enrollment.CourseId },
                                 { "Course Name", course?.CourseName ?? "Unknown" },
                                 { "Course Instructor", course?.InstructorName ?? "Unknown" },
                                 { "Course Duration", course?.Duration ?? "Unknown" }
                             };
-                        })
-                        .ToList()
+                        }).ToList()
                     }
-                },
+                }
             };
 
             return result;
@@ -85,9 +64,10 @@ namespace DAL.Repos
 
         public bool Delete(int id)
         {
-            var ex = Get(id);
-            if (ex == null) return false;
-            db.Students.Remove(ex);
+            var existing = Get(id);
+            if (existing == null) return false;
+
+            db.Students.Remove(existing);
             return db.SaveChanges() > 0;
         }
 
@@ -103,21 +83,25 @@ namespace DAL.Repos
 
         public List<Student> SearchByName(string name)
         {
-            return db.Students.Where(s => s.Name.Contains(name)).ToList();
+            return db.Students
+                .Where(s => s.Name.Contains(name))
+                .ToList();
         }
 
         public List<Enrollment> SeeEnrollments(int id)
         {
-            return db.Enrollments.Where(e => e.StudentId == id).ToList();
+            return db.Enrollments
+                .Where(e => e.StudentId == id)
+                .ToList();
         }
 
-        public bool Update(Student s)
+        public bool Update(Student student)
         {
-            var ex = Get(s.StudentId);
-            if (ex == null) return false;
-            db.Entry(ex).CurrentValues.SetValues(s);
+            var existing = Get(student.StudentId);
+            if (existing == null) return false;
+
+            db.Entry(existing).CurrentValues.SetValues(student);
             return db.SaveChanges() > 0;
         }
     }
 }
-
